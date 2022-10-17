@@ -6,16 +6,20 @@ public class Scoop : MonoBehaviour
 {
     private const float SPEED = 0.15f;
 
+    public GameObject[] ScrapObjects;
+    public GameObject ScoopObject;
+
     private Animator scoopAnimator;
     private Rigidbody scoopRigidbody;
     private float positionX, positionY;
-    private bool load;
+    private int scrapCount = 0;
 
     private void Start()
     {
         scoopRigidbody = GetComponent<Rigidbody>();
         scoopAnimator = GetComponent<Animator>();
-        load = false;
+        DataHolder.scoopLoad = false;
+        StartCoroutine(ScrapSpawn());
     }
 
     private void Moving() 
@@ -23,7 +27,7 @@ public class Scoop : MonoBehaviour
         positionX = scoopRigidbody.position.x;
         positionY = scoopRigidbody.position.y;
         
-        if (Input.GetKey(KeyCode.D)) 
+        if (Input.GetKey(KeyCode.D) && positionX < 14.5f) 
         {
             positionX += SPEED;
         }
@@ -36,12 +40,41 @@ public class Scoop : MonoBehaviour
         {
             positionY += SPEED;
         }
-        else if (Input.GetKey(KeyCode.S)) 
+        else if (Input.GetKey(KeyCode.S) && positionY > 15f) 
         {
             positionY -= SPEED;
         }
 
         scoopRigidbody.position = new Vector3 (positionX, positionY, 3);
+    }
+
+    private IEnumerator ScrapSpawn() 
+    {
+        while (true) 
+        {
+            if (DataHolder.scoopLoad)
+            {
+                var i = Random.Range(0, 2);
+                var position = ScoopObject.transform.position;
+                position.x -= 2;
+                var rotation = Quaternion.Euler (0, 0, 90);
+
+                for (int j = 0; j < 5; j++)
+                {
+                    Instantiate(ScrapObjects[i], position, rotation);
+                    scrapCount++;
+                }
+
+                if(scrapCount == 25) 
+                {
+                    break;
+                }
+
+                yield return new WaitForSeconds(0.25f);
+            }
+
+            yield return null; 
+        }
     }
 
     public IEnumerator ScoopLoadAnim() 
@@ -50,17 +83,17 @@ public class Scoop : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                if (!load)
+                if (!DataHolder.scoopLoad)
                 {
                     scoopAnimator.Play("ScoopLoad");
                     yield return new WaitForSeconds(2f);
-                    load = true;
+                    DataHolder.scoopLoad = true;
                 }
                 else
                 {
                     scoopAnimator.Play("ScoopUnload");
                     yield return new WaitForSeconds(2f);
-                    load = false;
+                    DataHolder.scoopLoad = false;
                 }
             }
 

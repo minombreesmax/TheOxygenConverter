@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Converter : MonoBehaviour
 {
+    public GameObject converterSteel, carrierSteel;
+
     private Rigidbody converterRigidbody;
     private float rotationX = -90;
     private int turn;
@@ -11,6 +13,8 @@ public class Converter : MonoBehaviour
     void Start()
     {
         converterRigidbody = GetComponent<Rigidbody>();
+        converterSteel.SetActive(false); 
+        carrierSteel.SetActive(false);
         SetRotation(rotationX, 90, 0);
     }
 
@@ -24,17 +28,23 @@ public class Converter : MonoBehaviour
     {
         if (DataHolder.furmaInConverter == false)
         {
-            if (Input.GetKey(KeyCode.RightArrow) && rotationX < 0)
+            if (Input.GetKey(KeyCode.RightArrow) && rotationX < -15)
             {
                 rotationX++;
             }
-            else if (Input.GetKey(KeyCode.LeftArrow) && rotationX > -210)
+            else if (Input.GetKey(KeyCode.LeftArrow) && rotationX > -205)
             {
                 rotationX--;
             }
         }
 
+        var casting = DataHolder.converterTurn == 285 ? true : false;
+        converterSteel.SetActive(casting);
+        carrierSteel.SetActive(casting);
+
         SetRotation(rotationX, 90, 0);
+        print(DataHolder.converterTurn);
+        print(rotationX);
     }
 
     private void TurnCalculate(float angle) 
