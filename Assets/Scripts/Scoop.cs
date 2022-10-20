@@ -13,6 +13,7 @@ public class Scoop : MonoBehaviour
     private Rigidbody scoopRigidbody;
     private float positionX, positionY;
     private int scrapCount = 0;
+    private bool unloadingPermission;
 
     private void Start()
     {
@@ -26,25 +27,49 @@ public class Scoop : MonoBehaviour
     {
         positionX = scoopRigidbody.position.x;
         positionY = scoopRigidbody.position.y;
-        
-        if (Input.GetKey(KeyCode.D) && positionX < 14.5f) 
+
+        if (!DataHolder.scoopLoad)
         {
-            positionX += SPEED;
+            if (Input.GetKey(KeyCode.D) && positionX < 14f)
+            {
+                positionX += SPEED;
+            }
+            else if (Input.GetKey(KeyCode.A) && positionX > 0)
+            {
+                positionX -= SPEED;
+            }
+
+            if (Input.GetKey(KeyCode.W) && positionY < 25)
+            {
+                positionY += SPEED;
+            }
+            else if (Input.GetKey(KeyCode.S) && positionY > 15f)
+            {
+                positionY -= SPEED;
+            }
         }
-        else if (Input.GetKey(KeyCode.A) && positionX > 0) 
+        else 
         {
-            positionX -= SPEED;
+            if (Input.GetKey(KeyCode.D) && positionX < 15f)
+            {
+                positionX += SPEED;
+            }
+            else if (Input.GetKey(KeyCode.A) && positionX > 13.5f)
+            {
+                positionX -= SPEED;
+            }
+
+            if (Input.GetKey(KeyCode.W) && positionY < 21f)
+            {
+                positionY += SPEED;
+            }
+            else if (Input.GetKey(KeyCode.S) && positionY > 18f)
+            {
+                positionY -= SPEED;
+            }
         }
 
-        if (Input.GetKey(KeyCode.W) && positionY < 25) 
-        {
-            positionY += SPEED;
-        }
-        else if (Input.GetKey(KeyCode.S) && positionY > 15f) 
-        {
-            positionY -= SPEED;
-        }
-
+        unloadingPermission = positionX > 14 && Between(positionY, 18, 22) ? true : false;
         scoopRigidbody.position = new Vector3 (positionX, positionY, 3);
     }
 
@@ -77,11 +102,11 @@ public class Scoop : MonoBehaviour
         }
     }
 
-    public IEnumerator ScoopLoadAnim() 
+    private IEnumerator ScoopLoadAnim() 
     {
         while (true)
         {
-            if (Input.GetKeyDown(KeyCode.Q))
+            if (Input.GetKeyDown(KeyCode.Q) && unloadingPermission)
             {
                 if (!DataHolder.scoopLoad)
                 {
@@ -99,6 +124,11 @@ public class Scoop : MonoBehaviour
 
             yield return null;
         }
+    }
+
+    private bool Between(float value, float min, float max)
+    {
+        return value > min && value < max ? true : false;
     }
 
     private void FixedUpdate()

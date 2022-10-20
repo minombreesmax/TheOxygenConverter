@@ -6,7 +6,7 @@ public class Ladle : MonoBehaviour
 {
     private const float SPEED = 0.15f;
 
-    public GameObject Iron;
+    public GameObject Iron, IronLevel;
     private Animator ladleAnimator;
     private Rigidbody ladleRigidbody;
     private float positionX, positionY;
@@ -40,6 +40,7 @@ public class Ladle : MonoBehaviour
                     {
                         yield return new WaitForSeconds(7.5f);
                         Iron.SetActive(false);
+                        IronLevel.SetActive(false);
                         flooded = true;
                         ladleAnimator.Play("LadleUnload");
                         moving = true;

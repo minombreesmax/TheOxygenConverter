@@ -57,20 +57,20 @@ public class RollingEquipment : MonoBehaviour
         }
     }
 
-    private IEnumerator CarriersControl() 
+    private IEnumerator CarriersControl()
     {
-        while (true) 
+        while (true)
         {
-            if (Input.GetKey(KeyCode.R)) 
+            if (Input.GetKey(KeyCode.R) && DataHolder.carrierGo)
             {
-                if (!driveUp) 
+                if (!driveUp)
                 {
                     slagCarrierAnimator.Play("SlagCarrierComeIn");
                     steelCarrierAnimator.Play("SteelCarrierComeIn");
                     yield return new WaitForSeconds(4f);
                     driveUp = true;
                 }
-                else 
+                else
                 {
                     slagCarrierAnimator.Play("SlagCarrierGetOut");
                     steelCarrierAnimator.Play("SteelCarrierGetOut");
@@ -79,7 +79,7 @@ public class RollingEquipment : MonoBehaviour
                 }
             }
 
-            yield return null;  
+            yield return null;
         }
     }
 
@@ -106,6 +106,7 @@ public class RollingEquipment : MonoBehaviour
         SlagCarrier.transform.position = new Vector3(-15, 1.35f, 35);
         SteelCarrier.transform.position = new Vector3(-1, -1.2f, 39);
 
+        DataHolder.carrierGo = true;
         StartCoroutine("CarriersControl");
     }
 
