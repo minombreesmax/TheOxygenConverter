@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Converter : MonoBehaviour
 {
     public GameObject converterSteel, carrierSteel;
     public GameObject converterSlag, carrierSlag;
+    public Text converterTurnText; 
 
     private Rigidbody converterRigidbody;
     private float rotationX = -90;
@@ -103,6 +105,7 @@ public class Converter : MonoBehaviour
     {
         turn = (int)(angle + 90);
         turn = converterRigidbody.rotation.y > 0.5 ? 360 - turn : -turn;
+        converterTurnText.text = $"{turn}°";
         DataHolder.converterTurn = turn;
     }
 

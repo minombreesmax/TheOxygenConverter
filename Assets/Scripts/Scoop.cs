@@ -20,6 +20,7 @@ public class Scoop : MonoBehaviour
         scoopRigidbody = GetComponent<Rigidbody>();
         scoopAnimator = GetComponent<Animator>();
         DataHolder.scoopLoad = false;
+        DataHolder.scrapLoaded = false;
         StartCoroutine(ScrapSpawn());
     }
 
@@ -81,7 +82,6 @@ public class Scoop : MonoBehaviour
             {
                 var i = Random.Range(0, 2);
                 var position = ScoopObject.transform.position;
-                position.x -= 2;
                 var rotation = Quaternion.Euler (0, 0, 90);
 
                 for (int j = 0; j < 5; j++)
@@ -113,6 +113,7 @@ public class Scoop : MonoBehaviour
                     scoopAnimator.Play("ScoopLoad");
                     yield return new WaitForSeconds(2f);
                     DataHolder.scoopLoad = true;
+                    DataHolder.scrapLoaded = true;
                 }
                 else
                 {

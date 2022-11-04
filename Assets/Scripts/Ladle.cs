@@ -17,6 +17,7 @@ public class Ladle : MonoBehaviour
         ladleRigidbody = GetComponent<Rigidbody>();
         ladleAnimator = GetComponent<Animator>();
         flooded = false; moving = true;
+        DataHolder.ironPoured = false;
         Iron.SetActive(flooded);
     }
 
@@ -43,6 +44,7 @@ public class Ladle : MonoBehaviour
                         IronLevel.SetActive(false);
                         flooded = true;
                         ladleAnimator.Play("LadleUnload");
+                        DataHolder.ironPoured = true;
                         moving = true;
                     }
                 }
