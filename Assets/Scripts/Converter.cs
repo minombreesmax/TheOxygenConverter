@@ -10,13 +10,14 @@ public class Converter : MonoBehaviour
     public Text converterTurnText; 
 
     private Rigidbody converterRigidbody;
-    private float rotationX = -90;
+    private float rotationX = -90, minAngle, maxAngle;
     private int turn;
     private bool steelFlood = false, slagFlood = false;
 
     void Start()
     {
         converterRigidbody = GetComponent<Rigidbody>();
+        DataHolder.release = false;
     }
 
     private IEnumerator SteelMerging() 
@@ -36,6 +37,7 @@ public class Converter : MonoBehaviour
                 DataHolder.carrierGo = true;
                 DataHolder.steelMerging = false;
                 converterSteel.SetActive(false);
+                DataHolder.steelPoured = true;
                 StopCoroutine(SteelMerging()); 
             }
 
@@ -56,10 +58,11 @@ public class Converter : MonoBehaviour
             }
             else
             {
-                yield return new WaitForSeconds(12);
+                yield return new WaitForSeconds(13);
                 DataHolder.carrierGo = true;
                 DataHolder.slagMerging = false;
                 converterSlag.SetActive(false);
+                DataHolder.slagPoured = true;
                 StopCoroutine(SlagMerging());
             }
 
@@ -75,27 +78,40 @@ public class Converter : MonoBehaviour
 
     private void ConverterRotate() 
     {
-        if (!DataHolder.furmaInConverter && DataHolder.carrierGo)
+        if (!DataHolder.furmaInConverter && DataHolder.carrierGo && !DataHolder.scoopLoad && !DataHolder.ladleLoad)
         {
-            if (Input.GetKey(KeyCode.RightArrow) && rotationX < -15)
+            if(DataHolder.steelCarrierReady && DataHolder.slagCarrierReady) 
+            {
+                minAngle = -205;
+                maxAngle = -15;
+            }
+            else 
+            {
+                minAngle = -150;
+                maxAngle = -90;
+            }
+
+            if (Input.GetKey(KeyCode.RightArrow) && rotationX < maxAngle)
             {
                 rotationX++;
             }
-            else if (Input.GetKey(KeyCode.LeftArrow) && rotationX > -205)
+            else if (Input.GetKey(KeyCode.LeftArrow) && rotationX > minAngle)
             {
                 rotationX--;
             }
 
-            if(DataHolder.converterTurn == 285) 
+            if (DataHolder.release)
             {
-                StartCoroutine(SteelMerging());
-            }
+                if (DataHolder.converterTurn == 285)
+                {
+                    StartCoroutine(SteelMerging());
+                }
 
-            if(DataHolder.converterTurn == 115) 
-            {
-                StartCoroutine(SlagMerging());
+                if (DataHolder.converterTurn == 115)
+                {
+                    StartCoroutine(SlagMerging());
+                }
             }
-
         }
 
         SetRotation(rotationX, 90, 0);

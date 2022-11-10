@@ -25,7 +25,7 @@ public class RollingEquipment : MonoBehaviour
     {
         while (true)
         {
-            if (Input.GetKey(KeyCode.E)) 
+            if (Input.GetKey(KeyCode.E) && DataHolder.scrapLoaded && !DataHolder.scoopLoad && !DataHolder.ladleLoad) 
             {
                 if (!substitution) 
                 {

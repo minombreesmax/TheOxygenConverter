@@ -5,8 +5,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
-using static UnityEditorInternal.ReorderableList;
 
 public class UI : MonoBehaviour
 {
@@ -22,9 +20,9 @@ public class UI : MonoBehaviour
     public Text[] Table1, Table2, Table3, Table4;
 
     public Text steelTtext, steelTplaceholder, T, slagBText, slagBPlaceholder;
-    public Slider Intensity;
-    public Text IntensityText, MessageBoxText;
-    public Button ScrapRandom, IronDefault, IronApplyData, SteelTCount, SlagBDefault, SlagBApplyData, CountMetShikhta, Smelting, NewSmelting;
+    public Slider timeSpeed;
+    public Text timeSpeedText, MessageBoxText;
+    public Button ScrapRandom, IronDefault, IronApplyData, SteelTCount, SlagBDefault, SlagBApplyData, CountMetShikhta, Smelting;
     public GameObject MessageBox, ExhaustGases;
 
     private string[] ParametersNames = { "C", "Mn", "Si", "P", "S", "T" };
@@ -38,25 +36,23 @@ public class UI : MonoBehaviour
     private float[] ScrapParameters, CurrentIronParameters;
     private double[,] MaterialsParameters, SlagParameters;
     private double[] SlagGMaterials;
-    private bool[] Steps = new bool[5];
 
     private double tmp;
-    private float steelC, timer = 0, V = 0.047f;
-    private bool run = false;
+    private float steelC, V = 0.047f;
     
     private float deltaMn, deltaP, deltaS;
     private float scrapG, S_TO, deltascrapG, ironG;
     private float tmpG, GCO, GCO2, GSiO2, GMnO2, GPO2;
     private float VO2_CO, VO2_CO2, VO2_SiO2, VO2_MnO2, VO2_PO2;
     private float GC_CO, GC_CO2, GSi_SiO2, GMn_MnO, GP_P2O5, GS_CaS, kol_oxydov;
-    private float intensity, slagB, iC;
+    private float slagB, iC, intensity = 2f;
     private int Fe_TO, j;
 
     private void Start()
     {
         MessageBox.SetActive(false);
-        DataHolder.release = false;
         SetSteps(false);
+        StartCoroutine(ButtonsStatus());
     }
 
     public void Ok()
@@ -76,14 +72,14 @@ public class UI : MonoBehaviour
             CurrentIronParameters[i] = DefaultIronParameters[i];
         }
 
-        Steps[0] = true;
+        DataHolder.Steps[1] = true;
     }
 
     public void DefaultSlagB() 
     {
         slagB = DEFAULT_B;
         slagBPlaceholder.text = $"{slagB}";
-        Steps[3] = true;
+        DataHolder.Steps[3] = true;
     }
 
     public void SetupValues()
@@ -124,11 +120,11 @@ public class UI : MonoBehaviour
         {
             if (CurrentIronParameters[i] <= 0)
             {
-                Steps[0] = false;
+                DataHolder.Steps[1] = false;
                 break;
             }
 
-            Steps[0] = true;
+            DataHolder.Steps[1] = true;
         }
     }
 
@@ -142,78 +138,7 @@ public class UI : MonoBehaviour
             ScrapParametersPlaceholders[i].text = $"{ScrapParameters[i]}";
         }
 
-        Steps[1] = true;
-    }
-
-    private void RandomMeterials() 
-    {
-        SlagGMaterials = new double[PARAMETERS_COUNT];
-        MaterialsParameters = new double[PARAMETERS_COUNT, 7];
-
-        Fe_TO = (int)UnityEngine.Random.Range(59, 65);
-
-        //Витрати на плавку
-        SlagGMaterials[1] = (float)UnityEngine.Random.Range(0.1f, 0.4f);
-        SlagGMaterials[2] = (float)UnityEngine.Random.Range(0f, 1.5f);
-        SlagGMaterials[3] = (float)UnityEngine.Random.Range(0.2f, 1f);
-        SlagGMaterials[4] = (float)UnityEngine.Random.Range(0.2f, 2f);
-
-        //Вміст вапна
-        MaterialsParameters[0, 0] = UnityEngine.Random.Range(80f, 92f);
-        MaterialsParameters[0, 1] = UnityEngine.Random.Range(1f, 5f);
-        var tmp = MaterialsParameters[0, 0] + MaterialsParameters[0, 1];
-        MaterialsParameters[0, 4] = 100 - tmp > 10 ? UnityEngine.Random.Range(0f, 10f) : UnityEngine.Random.Range(0, 100 - (float)tmp);
-        MaterialsParameters[0, 5] = 100 - tmp - MaterialsParameters[0, 4];
-
-        //Вміст плавікового шпату
-        MaterialsParameters[1, 0] = UnityEngine.Random.Range(0f, 5f);
-        MaterialsParameters[1, 1] = UnityEngine.Random.Range(3f, 20f);
-        MaterialsParameters[1, 5] = 100 - (MaterialsParameters[1, 0] + MaterialsParameters[1, 1]);
-
-        //Вміст твердого окислювача
-        MaterialsParameters[2, 0] = UnityEngine.Random.Range(1f, 14f);
-        MaterialsParameters[2, 1] = UnityEngine.Random.Range(4f, 12f);
-        MaterialsParameters[2, 3] = UnityEngine.Random.Range(1f, 18f);
-        tmp = MaterialsParameters[2, 0] + MaterialsParameters[2, 1] + MaterialsParameters[2, 3];
-        MaterialsParameters[2, 2] = (Fe_TO - MaterialsParameters[2, 3] * (56 / 72)) * (160 / 112);
-        MaterialsParameters[2, 4] = 0;
-        MaterialsParameters[2, 5] = 100 - tmp - MaterialsParameters[2, 2];
-
-        //Вміст футерування конвертеру
-        MaterialsParameters[3, 0] = UnityEngine.Random.Range(15f, 65f);
-        MaterialsParameters[3, 1] = UnityEngine.Random.Range(1f, 5f);
-        MaterialsParameters[3, 2] = UnityEngine.Random.Range(1f, 2f);
-        MaterialsParameters[3, 3] = 0;
-        MaterialsParameters[3, 4] = UnityEngine.Random.Range(0f, 20f);
-       
-        tmp = 0;
-        for (int i = 0; i < 5; i++)
-            tmp += MaterialsParameters[3, i];
-
-        MaterialsParameters[3, 5] = 100 - tmp;
-
-        //Вміст міксерного шлаку
-        MaterialsParameters[4, 0] = UnityEngine.Random.Range(25f, 35f);
-        MaterialsParameters[4, 1] = UnityEngine.Random.Range(30f, 40f);
-        MaterialsParameters[4, 2] = UnityEngine.Random.Range(0f, 1.5f);
-        MaterialsParameters[4, 3] = UnityEngine.Random.Range(5f, 7f);
-
-        tmp = 0;
-        for (int i = 0; i < PARAMETERS_COUNT; i++)
-        {
-            tmp += MaterialsParameters[4, i];
-            MaterialsParameters[i, 6] = 100;
-        }
-
-        MaterialsParameters[4, 5] = 100 - tmp;
-    }
-
-    private void SteelTemperature(float C, ref float T) 
-    {
-        T = C > 0 ? 1539 - 80 * C + 80 : 1619;
-
-        if(run)
-            MetalParametersPlaceholders[5].text = $"{(int)Math.Round(T, 3)}";
+        DataHolder.Steps[0] = true;
     }
 
     public void SteelTButton()
@@ -257,7 +182,7 @@ public class UI : MonoBehaviour
 
         SteelTemperature(steelC, ref MetalParameters[5]);
         T.text = $"{MetalParameters[5]}";
-        Steps[2] = true;
+        DataHolder.Steps[2] = MetalParameters[5] > 0 ? true : false;
     }
 
     public void SlagBButton() 
@@ -295,7 +220,7 @@ public class UI : MonoBehaviour
             MessageBox.SetActive(true);
         }
 
-        Steps[3] = true;
+        DataHolder.Steps[3] = true;
     }
 
     public void StaticModel()
@@ -390,14 +315,24 @@ public class UI : MonoBehaviour
     public void StartSmelting()
     {
         MessageBox.SetActive(false);
-        ExhaustGases.SetActive(true);
-        run = true;
+        DataHolder.furmaSet = -1;
+        StartCoroutine("DynamicModel");
+    }
+
+    public void StartNewSmelting() 
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    public void Exit() 
+    {
+        Application.Quit();
     }
 
     private void SetSteps(bool set) 
     {
-        for (int i = 0; i < Steps.Length; i++)
-            Steps[i] = set;
+        for (int i = 0; i < DataHolder.Steps.Length; i++)
+            DataHolder.Steps[i] = set;
     }
 
     private void DeltaRandom(float dMnMin, float dMnMax, float dPMin, float dPMax, float dSMin, float dSMax) 
@@ -436,6 +371,69 @@ public class UI : MonoBehaviour
         {
             SlagParameters[i, 8] = SlagParameters[i, 7] * SlagParameters[3, 8] / SlagParameters[3, 7];
         }
+    }
+
+    private void RandomMeterials()
+    {
+        SlagGMaterials = new double[PARAMETERS_COUNT];
+        MaterialsParameters = new double[PARAMETERS_COUNT, 7];
+
+        Fe_TO = (int)UnityEngine.Random.Range(59, 65);
+
+        //Витрати на плавку
+        SlagGMaterials[1] = (float)UnityEngine.Random.Range(0.1f, 0.4f);
+        SlagGMaterials[2] = (float)UnityEngine.Random.Range(0f, 1.5f);
+        SlagGMaterials[3] = (float)UnityEngine.Random.Range(0.2f, 1f);
+        SlagGMaterials[4] = (float)UnityEngine.Random.Range(0.2f, 2f);
+
+        //Вміст вапна
+        MaterialsParameters[0, 0] = UnityEngine.Random.Range(80f, 92f);
+        MaterialsParameters[0, 1] = UnityEngine.Random.Range(1f, 5f);
+        var tmp = MaterialsParameters[0, 0] + MaterialsParameters[0, 1];
+        MaterialsParameters[0, 4] = 100 - tmp > 10 ? UnityEngine.Random.Range(0f, 10f) : UnityEngine.Random.Range(0, 100 - (float)tmp);
+        MaterialsParameters[0, 5] = 100 - tmp - MaterialsParameters[0, 4];
+
+        //Вміст плавікового шпату
+        MaterialsParameters[1, 0] = UnityEngine.Random.Range(0f, 5f);
+        MaterialsParameters[1, 1] = UnityEngine.Random.Range(3f, 20f);
+        MaterialsParameters[1, 5] = 100 - (MaterialsParameters[1, 0] + MaterialsParameters[1, 1]);
+
+        //Вміст твердого окислювача
+        MaterialsParameters[2, 0] = UnityEngine.Random.Range(1f, 14f);
+        MaterialsParameters[2, 1] = UnityEngine.Random.Range(4f, 12f);
+        MaterialsParameters[2, 3] = UnityEngine.Random.Range(1f, 18f);
+        tmp = MaterialsParameters[2, 0] + MaterialsParameters[2, 1] + MaterialsParameters[2, 3];
+        MaterialsParameters[2, 2] = (Fe_TO - MaterialsParameters[2, 3] * (56 / 72)) * (160 / 112);
+        MaterialsParameters[2, 4] = 0;
+        MaterialsParameters[2, 5] = 100 - tmp - MaterialsParameters[2, 2];
+
+        //Вміст футерування конвертеру
+        MaterialsParameters[3, 0] = UnityEngine.Random.Range(15f, 65f);
+        MaterialsParameters[3, 1] = UnityEngine.Random.Range(1f, 5f);
+        MaterialsParameters[3, 2] = UnityEngine.Random.Range(1f, 2f);
+        MaterialsParameters[3, 3] = 0;
+        MaterialsParameters[3, 4] = UnityEngine.Random.Range(0f, 20f);
+
+        tmp = 0;
+        for (int i = 0; i < 5; i++)
+            tmp += MaterialsParameters[3, i];
+
+        MaterialsParameters[3, 5] = 100 - tmp;
+
+        //Вміст міксерного шлаку
+        MaterialsParameters[4, 0] = UnityEngine.Random.Range(25f, 35f);
+        MaterialsParameters[4, 1] = UnityEngine.Random.Range(30f, 40f);
+        MaterialsParameters[4, 2] = UnityEngine.Random.Range(0f, 1.5f);
+        MaterialsParameters[4, 3] = UnityEngine.Random.Range(5f, 7f);
+
+        tmp = 0;
+        for (int i = 0; i < PARAMETERS_COUNT; i++)
+        {
+            tmp += MaterialsParameters[4, i];
+            MaterialsParameters[i, 6] = 100;
+        }
+
+        MaterialsParameters[4, 5] = 100 - tmp;
     }
 
     private void SlagCalculation() 
@@ -590,7 +588,15 @@ public class UI : MonoBehaviour
         Table2Filling();
         Table3Filling();
         Table4Filling();
-        Steps[4] = true;
+        DataHolder.Steps[4] = true;
+    }
+
+    private void SteelTemperature(float C, ref float T)
+    {
+        T = C > 0 ? 1539 - 80 * C + 80 : 0;
+
+        if (DataHolder.smelting)
+            MetalParametersPlaceholders[5].text = $"{(int)Math.Round(T, 3)}";
     }
 
     private void CarbonOxidation(ref float С, float Si, float T, float speed) 
@@ -615,15 +621,16 @@ public class UI : MonoBehaviour
 
         if (С - steelC < 0.01f)
         {
-            run = false;
-            ExhaustGases.SetActive(false);
+            DataHolder.smelting = false;
             DataHolder.release = true;
+            DataHolder.furmaSet = 1;
+            StartCoroutine(SmeltingEnd());
         }
     }
 
-    private void ManganeseOxidation(ref float Mn) 
+    private void ManganeseOxidation(ref float Mn, float steelMn, float speed) 
     {
-        Mn = (float)(StartMetalParameters[1] * Math.Pow(j, -0.17f));
+        Mn = Mn > steelMn ? (float)(StartMetalParameters[1] * Math.Pow(j, -0.17f) * speed) : Mn -= (Mn / 100000);
     }
 
     private void SiliconOxidation(ref float Si, float speed) 
@@ -636,68 +643,93 @@ public class UI : MonoBehaviour
         {
             Si = (float)(Si - 0.525 * Math.Pow(Si, 0.6f) * intensity * (28 / 22.4f) * speed);
         }
+
+        Si = Si > 0 ? Si : 0;
     }
 
-    private void PhosphorusOxidation(ref float P, float speed) 
+    private void PhosphorusOxidation(ref float P, float steelP, float speed) 
     {
         var dP = (float)(4.1 * V * iC * SlagParameters[7, 7] * P * speed);
-        P -= dP;
+        P = P > steelP ? P -= dP : P -= (dP/100);
     }
 
-    private void SulfurOxidation(ref float S, float speed) 
+    private void SulfurOxidation(ref float S, float steelS, float speed) 
     {
         var dS = (float)(0.005 * (1 - Math.Exp(-1.8716)) * speed);
-        S -= dS;
+        S = S > steelS? S -= dS : S -= (dS/100);
     }
 
-    private void DynamicModel(bool run) 
-    {
-        if (run == true && steelC < MetalParameters[0])
-        {
-            timer += 0.00001f;
-            j++;
-
-            SteelTemperature(MetalParameters[0], ref MetalParameters[5]);
-            CarbonOxidation(ref MetalParameters[0], MetalParameters[2], MetalParameters[5], 0.01f);
-            ManganeseOxidation(ref MetalParameters[1]);
-            SiliconOxidation(ref MetalParameters[2], 0.001f);
-            PhosphorusOxidation(ref MetalParameters[3], 0.001f);
-            SulfurOxidation(ref MetalParameters[4], 0.002f);  
-
-            for (int i = 0; i < PARAMETERS_COUNT; i++)
-            {
-                MetalParameters[i] = MetalParameters[i] > ResidualConcentration[i] ? MetalParameters[i] : ResidualConcentration[i];
-                MetalParametersPlaceholders[i].text = $"{Math.Round(MetalParameters[i], 3)}";
-            }
-        }
-    }
-
-    private float GetNC(float C) 
+    private float GetNC(float C)
     {
         float D = 451584 + 4 * 816 * C;
         return (float)(672 + Math.Sqrt(D)) / 1632 * 100;
     }
 
-    private void ButtonsStatus() 
+    private IEnumerator DynamicModel()
     {
-        ScrapRandom.interactable = DataHolder.scrapLoaded ? true : false;
-        IronDefault.interactable = DataHolder.ironPoured ? true : false;
-        IronApplyData.interactable = DataHolder.ironPoured ? true : false;
-        SteelTCount.interactable = DataHolder.scrapLoaded && DataHolder.ironPoured? true : false;
-        SlagBDefault.interactable = SteelTCount.interactable;
-        SlagBApplyData.interactable = SteelTCount.interactable;
-        CountMetShikhta.interactable = Steps[0] == true && Steps[1] == true && Steps[2] == true && Steps[3] == true ? true : false;
-        Smelting.interactable = Steps[4] && DataHolder.furmaPosition < 7000 ? true : false;
+        while (true)
+        {
+            if (steelC < MetalParameters[0] && DataHolder.smelting)
+            {
+                j++;
+
+                SteelTemperature(MetalParameters[0], ref MetalParameters[5]);
+                CarbonOxidation(ref MetalParameters[0], MetalParameters[2], MetalParameters[5], 0.01f);
+                ManganeseOxidation(ref MetalParameters[1], ResidualConcentration[1], 1f);
+                SiliconOxidation(ref MetalParameters[2], 0.001f);
+                PhosphorusOxidation(ref MetalParameters[3], ResidualConcentration[3], 0.001f);
+                SulfurOxidation(ref MetalParameters[4], ResidualConcentration[4], 0.002f);
+
+                if (!DataHolder.smelting)
+                    yield return new WaitForSeconds(2);
+
+                ExhaustGases.SetActive(DataHolder.smelting);
+
+                Time.timeScale = timeSpeed.value;
+                timeSpeedText.text = $"{Math.Round(timeSpeed.value,1)}x";
+
+                for (int i = 0; i < PARAMETERS_COUNT; i++)
+                {
+                    MetalParametersPlaceholders[i].text = $"{Math.Round(MetalParameters[i], 3)}";
+                }
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
-    private void FixedUpdate()
+    private IEnumerator ButtonsStatus() 
     {
-        intensity = Intensity.value;
-        IntensityText.text = $"{intensity}";
+        while (true)
+        {
+            ScrapRandom.interactable = DataHolder.scrapLoaded && !DataHolder.smelting? true : false;
+            IronDefault.interactable = DataHolder.ironPoured && !DataHolder.smelting ? true : false;
+            IronApplyData.interactable = DataHolder.ironPoured && !DataHolder.smelting ? true : false;
+            SteelTCount.interactable = DataHolder.scrapLoaded && DataHolder.ironPoured && !DataHolder.smelting ? true : false;
+            SlagBDefault.interactable = SteelTCount.interactable;
+            SlagBApplyData.interactable = SteelTCount.interactable;
+            CountMetShikhta.interactable = DataHolder.Steps[0] == true && DataHolder.Steps[1] == true && DataHolder.Steps[2] == true && DataHolder.Steps[3] == true && !DataHolder.smelting ? true : false;
+            Smelting.interactable = DataHolder.Steps[4] && DataHolder.converterTurn == 0 && !DataHolder.smelting ? true : false;
 
-        DynamicModel(run);
-        ButtonsStatus();
-        
+            if (DataHolder.smelting)
+                break;
+
+            yield return null;
+        }
     }
 
+    private IEnumerator SmeltingEnd() 
+    {
+        while (true)
+        {
+            if (DataHolder.steelPoured && DataHolder.slagPoured)
+            {
+                MessageBox.SetActive(true);
+                MessageBoxText.text = "Плавка пройшла успішно!\n Якщо треба провести ще одну, натисніть 'Нова плавка'";
+                break;
+            }
+
+            yield return null;
+        }
+    }
 }

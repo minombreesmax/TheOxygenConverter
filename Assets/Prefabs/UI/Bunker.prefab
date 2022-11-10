@@ -62,10 +62,10 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_HighlightedColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+    m_PressedColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+    m_SelectedColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+    m_DisabledColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -559,7 +559,7 @@ GameObject:
   - component: {fileID: 7999141394503962023}
   - component: {fileID: 7999141394503962021}
   - component: {fileID: 7999141394503962020}
-  - component: {fileID: 3295127552025659981}
+  - component: {fileID: 2875412454169851107}
   m_Layer: 5
   m_Name: Bunker
   m_TagString: Untagged
@@ -613,7 +613,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.103773594, g: 0.10034711, b: 0.10034711, a: 0.392}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -629,7 +629,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3295127552025659981
+--- !u!114 &2875412454169851107
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -638,7 +638,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7999141394503962022}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2433fe76ce6b6345978049c35c1c727, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c7a527d1bfd3f34a91961ad98b3237e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Flap: {fileID: 0}
@@ -646,6 +646,8 @@ MonoBehaviour:
   Close: {fileID: 0}
   productivitySlider: {fileID: 0}
   productivityText: {fileID: 0}
+  PartOfShkhta: {fileID: 0}
+  BunkerObject: {fileID: 0}
 --- !u!1 &7999141394589885565
 GameObject:
   m_ObjectHideFlags: 0

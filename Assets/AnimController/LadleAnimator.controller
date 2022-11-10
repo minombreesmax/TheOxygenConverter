@@ -21,7 +21,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 203c749a3d0216c42bc88a695e833447, type: 2}
-  m_Tag: 
+  m_Tag: LadleGetOut
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -129,7 +129,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: b360434b4f0f23541a9c078a5d6f3d7f, type: 2}
-  m_Tag: 
+  m_Tag: LadleComeIn
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -155,7 +155,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: aa18eda6f0215064d930d6c775d2698e, type: 2}
-  m_Tag: 
+  m_Tag: LadleUnload
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -181,7 +181,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: d7cc80e19f9704b4a92e1bddbc0ca612, type: 2}
-  m_Tag: 
+  m_Tag: LadleLoad
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 

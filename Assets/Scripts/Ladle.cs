@@ -34,6 +34,7 @@ public class Ladle : MonoBehaviour
                         moving = false;
                         ladleAnimator.Play("LadleLoad");
                         yield return new WaitForSeconds(2f);
+                        DataHolder.ladleLoad = true;
                         Iron.SetActive(true);
                     }
 
@@ -44,6 +45,7 @@ public class Ladle : MonoBehaviour
                         IronLevel.SetActive(false);
                         flooded = true;
                         ladleAnimator.Play("LadleUnload");
+                        DataHolder.ladleLoad = false;
                         DataHolder.ironPoured = true;
                         moving = true;
                     }

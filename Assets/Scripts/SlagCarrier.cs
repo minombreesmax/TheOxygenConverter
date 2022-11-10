@@ -5,13 +5,16 @@ using UnityEngine;
 public class SlagCarrier : MonoBehaviour
 {
     public GameObject Slag;
+    public float position;
     private Animator animator;
+
 
     private void Start()
     {
         animator = GetComponent<Animator>();
         Slag.SetActive(false);
         StartCoroutine(SlagLevel());
+        StartCoroutine(CarrierReady());
     }
 
     private IEnumerator SlagLevel()
@@ -29,4 +32,14 @@ public class SlagCarrier : MonoBehaviour
         }
 
     }
+
+    private IEnumerator CarrierReady()
+    {
+        while (true) 
+        {
+            DataHolder.slagCarrierReady = transform.position.z <= position ? true : false;
+            yield return new WaitForSeconds(1);
+        }
+    }
+
 }
