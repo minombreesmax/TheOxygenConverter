@@ -10,5 +10,6 @@ public static class DataHolder
     public static bool steelMerging { get; set; }
     public static bool slagMerging { get; set; }
     public static bool release { get; set; }
+    public static float[] BunkersFilling = new float[6];
 }
 
