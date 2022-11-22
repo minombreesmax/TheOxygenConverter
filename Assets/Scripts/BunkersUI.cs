@@ -13,6 +13,7 @@ public class BunkersUI : MonoBehaviour
     public Button[] BunkersOpenButton;
 
     private bool[] BunkerIsOpen = new bool[BUNKERS_COUNT];
+    private float[] BunkersStartFill = new float[BUNKERS_COUNT];
 
     private void Start()
     {
@@ -30,14 +31,24 @@ public class BunkersUI : MonoBehaviour
         DataHolder.BunkersFilling[4] = UnityEngine.Random.Range(50, 200);
         DataHolder.BunkersFilling[5] = UnityEngine.Random.Range(1000, 5000);
 
+        for(int i = 0; i < BUNKERS_COUNT; i++) 
+        {
+            BunkersStartFill[i] = DataHolder.BunkersFilling[i];
+        }
+
         UpdateBunkersFill();
+    }
+
+    private float BunkerFillLevel(int bunkerNumber) 
+    {
+        return bunkerNumber <= BUNKERS_COUNT? DataHolder.BunkersFilling[bunkerNumber] * 100 / BunkersStartFill[bunkerNumber] : 0;
     }
 
     private void UpdateBunkersFill() 
     {
         for (int i = 0; i < BunkersPlaceholders.Length; i++)
         {
-            BunkersPlaceholders[i].text = $"{Math.Round(DataHolder.BunkersFilling[i], 0)} êã";
+            BunkersPlaceholders[i].text = $"{Math.Round(BunkerFillLevel(i), 0)} %";
         }
     }
 

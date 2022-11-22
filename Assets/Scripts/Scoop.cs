@@ -113,13 +113,13 @@ public class Scoop : MonoBehaviour
                     scoopAnimator.Play("ScoopLoad");
                     yield return new WaitForSeconds(2f);
                     DataHolder.scoopLoad = true;
+                    DataHolder.scrapLoaded = true;
                 }
                 else
                 {
                     scoopAnimator.Play("ScoopUnload");
                     yield return new WaitForSeconds(2f);
                     DataHolder.scoopLoad = false;
-                    DataHolder.scrapLoaded = true;
                 }
             }
 

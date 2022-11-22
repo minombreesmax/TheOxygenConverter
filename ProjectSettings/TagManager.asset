@@ -7,10 +7,6 @@ TagManager:
   - Iron
   - Converter
   - Floor
-  - Flurite
-  - Lime
-  - Som
-  - Staurolite
   layers:
   - Default
   - TransparentFX

@@ -9,7 +9,7 @@ public class Bunker : MonoBehaviour
     public Button Open, Close;
     public Slider productivitySlider;
     public Text productivityText;
-
+    
     private Collider flapCollider;
 
     void Start()
@@ -28,22 +28,21 @@ public class Bunker : MonoBehaviour
         }
     }
 
-    public virtual void FlapOpen() 
+    public void FlapOpen() 
     {
         SetButtons(false, true);
     }
 
-    public virtual void FlapClose() 
+    public void FlapClose() 
     {
         SetButtons(true, false);
     }
 
-    protected void SetButtons(bool buttonOpen, bool buttonClose)
+    private void SetButtons(bool buttonOpen, bool buttonClose)
     {
         flapCollider.isTrigger = buttonOpen ? false : true;
         Open.interactable = buttonOpen;
         Close.interactable = buttonClose;
     }
 
-   
 }
